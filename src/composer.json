@@ -1,0 +1,36 @@
+{
+    "name": "h-iranshahi/laravel-command-box",
+    "description": "A collection of custom Laravel Artisan commands.",
+    "type": "library",
+    "keywords": ["laravel", "commands", "artisan"],
+    "homepage": "https://github.com/h-iranshahi/laravel-command-box",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hasan Iranshahi",
+            "email": "h.iranshahi67@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^8.0|^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Iransh\\CommandBox\\": "src/Commands/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Iransh\\CommandBox\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5|^10.0"
+    }
+}
