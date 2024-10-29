@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * Generate a seeder file based on existing data in a table, which 
@@ -18,12 +20,10 @@ class ExportDbTablesToSeedsCommand extends Command
     public function handle()
     {
         // Tables needed to export
-        $tables = [
-            'jobs',
-            'failed_jobs',
-            'accesses',
-            'blog_posts',
-        ];
+        $tables = [];
+
+        // All Tables
+        $tables = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
 
         foreach ($tables as $table) {
             $this->exportTableToSeed($table);
@@ -43,23 +43,30 @@ class ExportDbTablesToSeedsCommand extends Command
         }
 
         // Generate seed file path
-        $seedFileName = ucfirst(camel_case($table)) . 'Seeder.php';
+        $seedFileName = Str::studly($table) . 'Seeder.php';
         $seedFilePath = database_path("seeders/{$seedFileName}");
 
         // Create seed file content
         $seedContent = $this->generateSeedContent($table, $data);
 
-        // Save the seed file
-        File::put($seedFilePath, $seedContent);
+        if($seedContent !== false)
+        {
+            // Save the seed file
+            File::put($seedFilePath, $seedContent);
 
-        $this->info("Seed file created for table: {$table}");
+            $this->info("Seed file created for table: {$table}");
+        }
     }
 
     protected function generateSeedContent($table, $data)
     {
+        if($table == 'migrations') return false;
+
         $records = $data->map(function ($item) {
             return var_export((array) $item, true);
         })->implode(',' . PHP_EOL . '            ');
+
+        $tableName = Str::studly($table);
 
         return <<<PHP
 <?php
@@ -69,7 +76,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class {$table}Seeder extends Seeder
+class {$tableName}Seeder extends Seeder
 {
     public function run()
     {
